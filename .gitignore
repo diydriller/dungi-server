@@ -1,0 +1,14 @@
+.idea
+*.iws
+*.iml
+*.ipr
+
+out/
+build/
+.gradle/
+
+
+docker_data/
+images/
+
+.env

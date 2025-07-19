@@ -1,0 +1,21 @@
+jar {
+    enabled = false
+}
+bootJar {
+    enabled = true
+}
+
+dependencies {
+    implementation project(':domain-core')
+    implementation project(':common')
+    implementation project(':infrastructure:infrastructure-message')
+    implementation project(':infrastructure:infrastructure-storage')
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+    implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
+}
+
+bootBuildImage {
+    imageName = "diydriller/" + rootProject.name + '-' + project.name
+}

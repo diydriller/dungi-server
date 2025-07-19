@@ -1,0 +1,12 @@
+jar {
+    enabled = true
+}
+bootJar {
+    enabled = false
+}
+
+dependencies {
+    implementation project(':common')
+    implementation project(':domain-core')
+    implementation 'org.springframework.kafka:spring-kafka'
+}

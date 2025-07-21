@@ -11,9 +11,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Optional;
+import java.util.UUID;
+
+import static com.dungi.common.util.FileUtil.extractFileExt;
 
 @Component
 @ConditionalOnProperty(name = "file.kind", havingValue = "local")
@@ -24,17 +24,12 @@ public class FileLocalUploaderImpl implements FileUploader {
     private String fileDownPath;
 
     public String imageUpload(MultipartFile file) throws IOException {
-        String current_date = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
-
         Path basePath = Paths.get(fileUploadPath);
         Files.createDirectories(basePath);
 
-        String[] originFilenameParts = Optional.ofNullable(file.getOriginalFilename())
-                .map(name -> name.split("\\."))
-                .orElseThrow(() -> new IllegalArgumentException("파일 이름이 없습니다."));
-        String originFileExt = originFilenameParts[originFilenameParts.length - 1];
-
-        String imageName = "dungi-image" + current_date + "." + originFileExt;
+        String originFileExt = extractFileExt(file.getOriginalFilename());
+        String uuid = UUID.randomUUID().toString();
+        String imageName = "dungi-image" + uuid + "." + originFileExt;
         String imagePath = basePath.resolve(imageName).toString();
         String imageDownUrl = fileDownPath + imageName;
 

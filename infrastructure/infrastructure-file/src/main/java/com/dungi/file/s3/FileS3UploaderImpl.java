@@ -9,8 +9,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.UUID;
+
+import static com.dungi.common.util.FileUtil.extractFileExt;
 
 @Component
 @ConditionalOnProperty(name = "file.kind", havingValue = "s3")
@@ -24,8 +25,9 @@ public class FileS3UploaderImpl implements FileUploader {
 
     @Override
     public String imageUpload(MultipartFile file) throws Exception {
-        String current_date = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
-        String originalFilename = "dungi/image" + current_date + file.getOriginalFilename();
+        String originFileExt = extractFileExt(file.getOriginalFilename());
+        String uuid = UUID.randomUUID().toString();
+        String originalFilename = "dungi-image" + uuid + "." + originFileExt;
 
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(file.getSize());

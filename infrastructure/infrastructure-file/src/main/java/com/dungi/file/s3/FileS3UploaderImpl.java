@@ -9,9 +9,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.UUID;
 
 import static com.dungi.common.util.FileUtil.extractFileExt;
+import static com.dungi.common.util.StringUtil.FILE_PREFIX;
 
 @Component
 @ConditionalOnProperty(name = "file.kind", havingValue = "s3")
@@ -24,10 +26,10 @@ public class FileS3UploaderImpl implements FileUploader {
     private String bucket;
 
     @Override
-    public String imageUpload(MultipartFile file) throws Exception {
+    public String imageUpload(MultipartFile file) throws IOException {
         String originFileExt = extractFileExt(file.getOriginalFilename());
         String uuid = UUID.randomUUID().toString();
-        String originalFilename = "dungi-image" + uuid + "." + originFileExt;
+        String originalFilename = FILE_PREFIX + uuid + "." + originFileExt;
 
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(file.getSize());

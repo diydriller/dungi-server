@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.util.UUID;
 
 import static com.dungi.common.util.FileUtil.extractFileExt;
+import static com.dungi.common.util.StringUtil.FILE_PREFIX;
 
 @Component
 @ConditionalOnProperty(name = "file.kind", havingValue = "local")
@@ -29,7 +30,7 @@ public class FileLocalUploaderImpl implements FileUploader {
 
         String originFileExt = extractFileExt(file.getOriginalFilename());
         String uuid = UUID.randomUUID().toString();
-        String imageName = "dungi-image" + uuid + "." + originFileExt;
+        String imageName = FILE_PREFIX + uuid + "." + originFileExt;
         String imagePath = basePath.resolve(imageName).toString();
         String imageDownUrl = fileDownPath + imageName;
 

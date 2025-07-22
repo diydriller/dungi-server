@@ -28,6 +28,10 @@ public class KakaoStrategyImpl implements SnsStrategy {
     private final KakaoApiHttpInterface kakaoApiService;
     private final KakaoAuthHttpInterface kakaoAuthService;
 
+    private static final String TOKEN_PREFIX = "Bearer ";
+    private static final String CONTENT_TYPE = "application/x-www-form-urlencoded";
+    private static final String GRANT_TYPE = "authorization_code";
+
     @Override
     public String getSnsEmail(String token) throws Exception {
         var kakaoInfo = fetchKakaoInfo(token);
@@ -52,7 +56,8 @@ public class KakaoStrategyImpl implements SnsStrategy {
 
     private KakaoInfoDto fetchKakaoInfo(String token) throws Exception {
         Call<KakaoInfoDto> retrofitCall = kakaoApiService.getKakaoInfo(
-                "Bearer " + token, "application/x-www-form-urlencoded"
+                TOKEN_PREFIX + token,
+                CONTENT_TYPE
         );
         Response<KakaoInfoDto> response = retrofitCall.execute();
 
@@ -64,8 +69,12 @@ public class KakaoStrategyImpl implements SnsStrategy {
 
     private SnsTokenDto fetchKakaoToken(String code) throws Exception {
         Call<SnsTokenDto> retrofitCall = kakaoAuthService.getKakaoToken(
-                "authorization_code", kakaoAccountId, kakaoCallbackUri, code, kakaoSecret
-                , "application/x-www-form-urlencoded"
+                GRANT_TYPE,
+                kakaoAccountId,
+                kakaoCallbackUri,
+                code,
+                kakaoSecret,
+                CONTENT_TYPE
         );
         Response<SnsTokenDto> response = retrofitCall.execute();
 

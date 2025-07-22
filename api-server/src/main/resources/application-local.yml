@@ -1,0 +1,89 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+  datasource:
+    source:
+      url: jdbc:mysql://host.docker.internal:3300/spring_dungi?rewriteBatchedStatements=true
+      username: ENC(H02XFv8kQYcw+JabYK2PWA==)
+      password: ENC(MKcemwLpfYeOL+VwyFG48HMhSOUdhSn9)
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      hikari:
+        maximum-pool-size: 10
+    replica:
+      url: jdbc:mysql://host.docker.internal:3301/spring_dungi?rewriteBatchedStatements=true
+      username: ENC(H02XFv8kQYcw+JabYK2PWA==)
+      password: ENC(uYPzCJbPjhvNmUQE5WODAm9YULJkkKPs)
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      hikari:
+        maximum-pool-size: 10
+
+  jpa:
+    database: mysql
+    hibernate:
+      ddl-auto: update
+    generate-ddl: true
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 100
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+redis:
+  port: 6300
+  host: host.docker.internal
+  password: ENC(vtjQc5k6ostA1TjT2QzQBE4yHnwl6EsI)
+  lettuce:
+    pool:
+      max-idle: 8
+      min-idle: 2
+      max-active: 8
+
+message:
+  kind: kafka
+kafka:
+  broker: host.docker.internal:29092
+
+file:
+  kind: local
+  upload:
+    path: ${user.dir}/images/
+  down:
+    path: host.docker.internal:9002/static/
+
+server:
+  tomcat:
+    threads:
+      max: 200
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
+
+database:
+  replication: false
+
+cloud:
+  aws:
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+
+kakao:
+  accountId: ${KAKAO_ACCOUNT_ID}
+  secret: ${KAKAO_SECRET}
+  callbackUri: ${KAKAO_CALLBACK_URI}
+
+twilio:
+  accountId: ${TWILIO_ACCOUNT_ID}
+  authToken: ${TWILIO_AUTH_TOKEN}
+  adminPhoneNumber: ${TWILIO_ADMIN_PHONE_NUMBER}
+
+jwt:
+  secret: ${JWT_SECRET}

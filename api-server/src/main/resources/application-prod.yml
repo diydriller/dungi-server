@@ -1,0 +1,64 @@
+aws:
+  paramstore:
+    enabled: true
+    prefix: /diydriller
+    profileSeparator: _
+    name: dungi
+
+spring:
+  config:
+    import: 'aws-parameterstore:'
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+  datasource:
+    source:
+      url: ${SPRING_DATASOURCE_URL}
+      username: ${SPRING_DATASOURCE_USERNAME}
+      password: ${SPRING_DATASOURCE_PASSWORD}
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      hikari:
+        maximum-pool-size: 10
+
+  jpa:
+    database: mysql
+    hibernate:
+      ddl-auto: validate
+    generate-ddl: true
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 100
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+redis:
+  port: 6379
+  host: ${REDIS_HOST}
+  password: ${REDIS_PASSWORD}
+  lettuce:
+    pool:
+      max-idle: 8
+      min-idle: 2
+      max-active: 8
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_ACCESS_KEY_ID}
+      secret-key: ${AWS_ACCESS_KEY_SECRET}
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+    s3:
+      bucket: diydriller-s3
+
+file:
+  kind: s3
+
+database:
+  replication: false

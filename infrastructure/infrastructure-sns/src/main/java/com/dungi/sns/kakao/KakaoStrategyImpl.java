@@ -5,18 +5,18 @@ import com.dungi.common.value.SnsProvider;
 import com.dungi.core.integration.sns.SnsStrategy;
 import com.dungi.sns.kakao.dto.KakaoInfoDto;
 import com.dungi.sns.kakao.dto.SnsTokenDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import retrofit2.Call;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.util.Optional;
 
 import static com.dungi.common.response.BaseResponseStatus.NOT_EXIST_USER;
 
 @Component
+@RequiredArgsConstructor
 public class KakaoStrategyImpl implements SnsStrategy {
     @Value("${kakao.accountId}")
     private String kakaoAccountId;
@@ -25,27 +25,9 @@ public class KakaoStrategyImpl implements SnsStrategy {
     @Value("${kakao.callbackUri}")
     private String kakaoCallbackUri;
 
-    private static final String KAKAO_API_URL = "https://kapi.kakao.com";
-    private static final String KAKAO_AUTH_URL = "https://kauth.kakao.com";
+    private final KakaoApiHttpInterface kakaoApiService;
+    private final KakaoAuthHttpInterface kakaoAuthService;
 
-    private final KakaoHttpInterface kakaoApiService;
-    private final KakaoHttpInterface kakaoAuthService;
-
-    public KakaoStrategyImpl() {
-        Retrofit kakaoApiRetrofit = new Retrofit.Builder()
-                .baseUrl(KAKAO_API_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        kakaoApiService = kakaoApiRetrofit.create(KakaoHttpInterface.class);
-
-        Retrofit kakaoAuthRetrofit = new Retrofit.Builder()
-                .baseUrl(KAKAO_AUTH_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        kakaoAuthService = kakaoAuthRetrofit.create(KakaoHttpInterface.class);
-    }
-
-    // 카카오 이메일 가져오기 메서드
     @Override
     public String getSnsEmail(String token) throws Exception {
         var kakaoInfo = fetchKakaoInfo(token);
@@ -55,7 +37,6 @@ public class KakaoStrategyImpl implements SnsStrategy {
                 .orElseThrow(() -> new NotFoundException(NOT_EXIST_USER));
     }
 
-    // 카카오 토큰 가져오기 메서드
     @Override
     public String getSnsToken(String code) throws Exception {
         var kakaoToken = fetchKakaoToken(code);

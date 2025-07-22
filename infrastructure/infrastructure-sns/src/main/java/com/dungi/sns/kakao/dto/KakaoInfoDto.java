@@ -9,7 +9,8 @@ public class KakaoInfoDto {
     Account kakao_account;
 
     @Data
-    public class Account{
+    @NoArgsConstructor
+    public static class Account{
         String email;
     }
 }

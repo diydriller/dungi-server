@@ -33,8 +33,8 @@ public class UserRoom extends BaseEntity {
 
     public UserRoom(Long userId, Room room) {
         this.userId = userId;
-        setRoom(room);
         this.deleteStatus = DeleteStatus.NOT_DELETED;
+        this.room = room;
     }
 
     public void leave() {
@@ -43,10 +43,5 @@ public class UserRoom extends BaseEntity {
 
     public void reenter() {
         this.deleteStatus = DeleteStatus.NOT_DELETED;
-    }
-
-    private void setRoom(Room room) {
-        this.room = room;
-        room.getUserRoomList().add(this);
     }
 }

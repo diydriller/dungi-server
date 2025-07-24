@@ -39,6 +39,11 @@ public class Room extends BaseEntity {
         this.deleteStatus = DeleteStatus.NOT_DELETED;
     }
 
+    public void addUser(Long userId){
+        var userRoom = new UserRoom(userId, this);
+        this.userRoomList.add(userRoom);
+    }
+
     public void deactivate() {
         this.deleteStatus = DeleteStatus.DELETED;
     }

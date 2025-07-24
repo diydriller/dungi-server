@@ -24,7 +24,7 @@ public class RoomService {
     @Transactional
     public Room createRoom(CreateRoomDto dto, Long userId) {
         var room = new Room(dto.getName(), dto.getColor());
-        new UserRoom(userId, room);
+        room.addUser(userId);
         return roomStore.saveRoom(room);
     }
 
@@ -33,14 +33,14 @@ public class RoomService {
     @Transactional
     public void enterRoom(Long roomId, Long userId) {
         var room = roomStore.getRoom(roomId);
-        roomStore.getUserRoomByDeleteStatus(userId, room, DeleteStatus.DELETED)
-                .ifPresentOrElse(
-                        UserRoom::reenter,
-                        () -> {
-                            var userRoom = new UserRoom(userId, room);
-                            roomStore.saveUserRoom(userRoom);
-                        }
-                );
+        var userRoom = roomStore.getUserRoomByDeleteStatus(userId, room, DeleteStatus.DELETED);
+        userRoom.ifPresentOrElse(
+                UserRoom::reenter,
+                () -> {
+                    room.addUser(userId);
+                    roomStore.saveRoom(room);
+                }
+        );
     }
 
     // 방 퇴장 기능
@@ -48,8 +48,9 @@ public class RoomService {
     @Transactional
     public void leaveRoom(Long roomId, Long userId) {
         var room = roomStore.getRoomEnteredByUser(userId, roomId);
-        roomStore.getUserRoomByDeleteStatus(userId, room, DeleteStatus.NOT_DELETED)
-                .ifPresent(UserRoom::leave);
+        var userRoom = roomStore.getUserRoomByDeleteStatus(userId, room, DeleteStatus.NOT_DELETED);
+        userRoom.ifPresent(UserRoom::leave);
+
         var count = roomStore.countUserRoom(room);
         if (count <= 0) {
             room.deactivate();
@@ -61,7 +62,6 @@ public class RoomService {
     @Transactional(readOnly = true)
     public List<RoomDetail> getAllRoomInfo(PageDto dto) {
         var roomList = roomStore.getAllRoomEnteredByUser(dto);
-
         List<RoomDetail> roomDetailList = new ArrayList<>();
         for (var room : roomList) {
             var memberInfoList = roomStore.getAllMemberInfo(room);

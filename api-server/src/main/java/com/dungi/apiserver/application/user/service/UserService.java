@@ -80,7 +80,7 @@ public class UserService {
     public void compareCode(String code, String phoneNumber) {
         String trimmedPhoneNumber = StringUtil.trimPhoneNumber(phoneNumber);
         String savedCode = userStore.getCode(trimmedPhoneNumber);
-        if (savedCode.equals(code)) {
+        if (!savedCode.equals(code)) {
             throw new BaseException(CODE_NOT_EQUAL);
         }
     }

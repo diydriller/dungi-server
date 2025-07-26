@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.dungi.common.util.StringUtil.NOTICE_TYPE;
+import static com.dungi.common.util.StringUtil.SAVE_NOTICE_VOTE_TOPIC;
 
 
 @Service
@@ -42,7 +43,7 @@ public class NoticeService {
                         .roomId(dto.getRoomId())
                         .userId(dto.getUserId())
                         .build(),
-                "save-notice-vote"
+                SAVE_NOTICE_VOTE_TOPIC
         );
     }
 }

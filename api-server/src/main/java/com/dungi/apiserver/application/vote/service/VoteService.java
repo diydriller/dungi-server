@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.dungi.common.util.StringUtil.SAVE_NOTICE_VOTE_TOPIC;
 import static com.dungi.common.util.StringUtil.VOTE_TYPE;
 
 @RequiredArgsConstructor
@@ -52,7 +53,7 @@ public class VoteService {
                         .type(VOTE_TYPE)
                         .id(savedVote.getId())
                         .build(),
-                "save-notice-vote"
+                SAVE_NOTICE_VOTE_TOPIC
         );
     }
 

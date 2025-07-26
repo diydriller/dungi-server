@@ -73,19 +73,17 @@ public class VoteService {
 
         var voteUserList = voteStore.getVoteUser(voteItemList);
         for (var voteUser : voteUserList) {
+            var choice = voteUser.getVoteUserChoice().getChoice();
             voteUserIdSet.add(voteUser.getUserId());
             if (voteUser.getUserId().equals(userId)) {
                 myChoiceList.add(voteUser.getVoteUserChoice().getVoteItemId());
             }
-            voteUserForChoiceMap.putIfAbsent(voteUser.getVoteUserChoice().getChoice(), new ArrayList<>());
-            voteUserForChoiceMap.get(voteUser.getVoteUserChoice().getChoice()).add(voteUser);
+            voteUserForChoiceMap.computeIfAbsent(choice, k-> new ArrayList<>())
+                            .add(voteUser);
         }
         for (var voteItem : voteItemList) {
             var choice = voteItem.getChoice();
-            List<VoteUserDetail> voteUser = new ArrayList<>();
-            if (voteUserForChoiceMap.containsKey(choice)) {
-                voteUser = voteUserForChoiceMap.get(choice);
-            }
+            List<VoteUserDetail> voteUser = voteUserForChoiceMap.getOrDefault(choice, List.of());
             voteChoiceDtoList.add(
                     new VoteItemInfo.VoteChoiceDto(choice, voteUser)
             );

@@ -10,6 +10,7 @@ public class StringUtil {
     public static final String VOTE_TYPE = "V";
     public static final String NOTICE_TYPE = "N";
     public static final String FILE_PREFIX = "dungi-image";
+    public static final String SAVE_NOTICE_VOTE_TOPIC = "save-notice-vote";
 
     public static String trimPhoneNumber(String phoneNumber) {
         return "+82" + phoneNumber.substring(1);

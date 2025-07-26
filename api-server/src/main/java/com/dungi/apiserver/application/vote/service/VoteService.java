@@ -64,40 +64,20 @@ public class VoteService {
         roomStore.getRoomEnteredByUser(userId, roomId);
 
         var vote = voteStore.getVote(voteId);
-
-        List<VoteItemInfo.VoteChoiceDto> voteChoiceDtoList = new ArrayList<>();
-        List<Long> myChoiceList = new ArrayList<>();
-        Set<Long> voteUserIdSet = new HashSet<>();
-        Map<String, List<VoteUserDetail>> voteUserForChoiceMap = new HashMap<>();
         var voteItemList = voteStore.getVoteItemList(vote);
 
         var voteUserList = voteStore.getVoteUser(voteItemList);
-        for (var voteUser : voteUserList) {
-            var choice = voteUser.getVoteUserChoice().getChoice();
-            voteUserIdSet.add(voteUser.getUserId());
-            if (voteUser.getUserId().equals(userId)) {
-                myChoiceList.add(voteUser.getVoteUserChoice().getVoteItemId());
-            }
-            voteUserForChoiceMap.computeIfAbsent(choice, k-> new ArrayList<>())
-                            .add(voteUser);
-        }
-        for (var voteItem : voteItemList) {
-            var choice = voteItem.getChoice();
-            List<VoteUserDetail> voteUser = voteUserForChoiceMap.getOrDefault(choice, List.of());
-            voteChoiceDtoList.add(
-                    new VoteItemInfo.VoteChoiceDto(choice, voteUser)
-            );
-        }
-
+        var voteUserData = collectVoteUserData(voteUserList, userId);
+        var voteChoiceDtoList = buildChoiceDtoList(voteItemList, voteUserData.voteUserForChoiceMap);
         int memberCnt = roomStore.getRoomMemberCnt(roomId);
 
         return VoteItemInfo.builder()
                 .title(vote.getTitle())
-                .choiceIdList(myChoiceList)
+                .choiceIdList(voteUserData.myChoiceList)
                 .isFinished(vote.getFinishStatus() == FinishStatus.FINISHED)
                 .choice(voteChoiceDtoList)
                 .isOwner(vote.getUserId().equals(userId))
-                .unVotedMemberCnt(memberCnt - voteUserIdSet.size())
+                .unVotedMemberCnt(memberCnt - voteUserData.myChoiceList.size())
                 .build();
     }
 
@@ -117,5 +97,48 @@ public class VoteService {
                             voteStore.saveUserVoteChoice(userVoteItem);
                         }
                 );
+    }
+
+    private static class VoteUserData {
+        List<Long> myChoiceList;
+        Set<Long> voteUserIdSet;
+        Map<String, List<VoteUserDetail>> voteUserForChoiceMap;
+
+        public VoteUserData(List<Long> myChoiceList, Set<Long> voteUserIdSet, Map<String, List<VoteUserDetail>> voteUserForChoiceMap) {
+            this.myChoiceList = myChoiceList;
+            this.voteUserIdSet = voteUserIdSet;
+            this.voteUserForChoiceMap = voteUserForChoiceMap;
+        }
+    }
+
+    private VoteUserData collectVoteUserData(List<VoteUserDetail> voteUserList, Long userId) {
+        List<Long> myChoiceList = new ArrayList<>();
+        Set<Long> voteUserIdSet = new HashSet<>();
+        Map<String, List<VoteUserDetail>> voteUserForChoiceMap = new HashMap<>();
+
+        for (var voteUser : voteUserList) {
+            voteUserIdSet.add(voteUser.getUserId());
+
+            if (voteUser.getUserId().equals(userId)) {
+                myChoiceList.add(voteUser.getVoteUserChoice().getVoteItemId());
+            }
+
+            String choice = voteUser.getVoteUserChoice().getChoice();
+            voteUserForChoiceMap.computeIfAbsent(choice, k -> new ArrayList<>()).add(voteUser);
+        }
+
+        return new VoteUserData(myChoiceList, voteUserIdSet, voteUserForChoiceMap);
+    }
+
+    private List<VoteItemInfo.VoteChoiceDto> buildChoiceDtoList(List<VoteItem> voteItemList, Map<String, List<VoteUserDetail>> voteUserForChoiceMap) {
+        List<VoteItemInfo.VoteChoiceDto> voteChoiceDtoList = new ArrayList<>();
+
+        for (var voteItem : voteItemList) {
+            String choice = voteItem.getChoice();
+            List<VoteUserDetail> voteUsers = voteUserForChoiceMap.getOrDefault(choice, List.of());
+            voteChoiceDtoList.add(new VoteItemInfo.VoteChoiceDto(choice, voteUsers));
+        }
+
+        return voteChoiceDtoList;
     }
 }

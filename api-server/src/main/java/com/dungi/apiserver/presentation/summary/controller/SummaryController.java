@@ -5,7 +5,6 @@ import com.dungi.apiserver.application.summary.service.WeeklyStatisticService;
 import com.dungi.apiserver.presentation.summary.dto.GetNoticeVoteResponseDto;
 import com.dungi.common.dto.PageDto;
 import com.dungi.common.response.BaseResponse;
-import com.dungi.common.util.TimeUtil;
 import com.dungi.core.domain.user.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpSession;
 import java.util.stream.Collectors;
 
-import static com.dungi.common.util.StringUtil.*;
+import static com.dungi.common.util.StringUtil.LOGIN_USER;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,16 +40,7 @@ public class SummaryController {
                                 .size(size)
                                 .build()
                 ).stream()
-                .map(nv -> GetNoticeVoteResponseDto.builder()
-                        .id(nv.getId())
-                        .profileImg(nv.getProfileImg())
-                        .userId(nv.getUserId())
-                        .isOwner(nv.getUserId().equals(user.getId()) ? "Y" : "N")
-                        .createdAt(TimeUtil.localDateTimeToTimeStr(nv.getCreatedAt()))
-                        .isNotice(nv.getType())
-                        .title(nv.getType().equals(VOTE_TYPE) ? nv.getContent() : null)
-                        .notice(nv.getType().equals(NOTICE_TYPE) ? nv.getContent() : null)
-                        .build()
+                .map(nv -> GetNoticeVoteResponseDto.of(nv, user.getId())
                 ).collect(Collectors.toList());
         return new BaseResponse<>(noticeVoteList);
     }

@@ -22,7 +22,10 @@ public class SummaryKafkaMessageListener {
     private final NoticeVoteStore noticeVoteStore;
     private final WeeklyStatisticStore weeklyStatisticStore;
 
-    @KafkaListener(topics = SAVE_NOTICE_VOTE_TOPIC, groupId = "summary-group")
+    private static final String NOTICE_VOTE_GROUP = "notice-vote-group";
+    private static final String WEEKLY_TODO_GROUP = "weekly-todo-group";
+
+    @KafkaListener(topics = SAVE_NOTICE_VOTE_TOPIC, groupId = NOTICE_VOTE_GROUP)
     public void saveNoticeVote(SaveNoticeVoteEvent event) {
         noticeVoteStore.saveNoticeVote(
                 NoticeVote.builder()
@@ -36,7 +39,7 @@ public class SummaryKafkaMessageListener {
         );
     }
 
-    @KafkaListener(topics = UPDATE_WEEKLY_TODO_TOPIC, groupId = "summary-group")
+    @KafkaListener(topics = UPDATE_WEEKLY_TODO_TOPIC, groupId = WEEKLY_TODO_GROUP)
     public void updateWeeklyTodoCount(UpdateWeeklyTodoCountEvent event) {
         var now = LocalDate.now();
         var weekFields = WeekFields.ISO;

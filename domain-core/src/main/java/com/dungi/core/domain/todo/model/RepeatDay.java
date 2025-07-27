@@ -5,6 +5,8 @@ import lombok.*;
 
 import javax.persistence.*;
 
+import java.time.DayOfWeek;
+
 import static com.dungi.common.response.BaseResponseStatus.INVALID_VALUE;
 
 
@@ -19,16 +21,17 @@ public class RepeatDay {
     @Column(name="repeat_day_id")
     private Long id;
 
-    private Integer day;
+    @Enumerated(EnumType.STRING)
+    private DayOfWeek dayOfWeek;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="todo_id")
     private RepeatTodo repeatTodo;
 
-    public RepeatDay(Integer day){
-        if(day == null) throw new BaseException(INVALID_VALUE);
+    public RepeatDay(DayOfWeek dayOfWeek){
+        if(dayOfWeek == null) throw new BaseException(INVALID_VALUE);
 
-        this.day = day;
+        this.dayOfWeek = dayOfWeek;
     }
 
     public void setRepeatTodo(RepeatTodo repeatTodo){

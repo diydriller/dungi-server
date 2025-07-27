@@ -5,6 +5,7 @@ import com.dungi.apiserver.application.todo.dto.CreateTodayTodoDto;
 import com.dungi.apiserver.application.todo.dto.GetRepeatTodoDto;
 import com.dungi.common.dto.PageDto;
 import com.dungi.common.util.TimeUtil;
+import com.dungi.core.domain.summary.event.UpdateWeeklyTodoCountEvent;
 import com.dungi.core.domain.todo.model.RepeatTodo;
 import com.dungi.core.domain.todo.model.TodayTodo;
 import com.dungi.core.domain.todo.model.Todo;
@@ -20,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.dungi.common.util.StringUtil.UPDATE_WEEKLY_TODO_TOPIC;
 
 
 @Service
@@ -115,6 +118,14 @@ public class TodoService {
         roomStore.getRoomEnteredByUser(userId, roomId);
         var todo = todoStore.findTodayTodo(roomId, todoId);
         todo.complete();
+
+        messagePublisher.publish(
+                UpdateWeeklyTodoCountEvent.builder()
+                        .userId(userId)
+                        .roomId(roomId)
+                        .build(),
+                UPDATE_WEEKLY_TODO_TOPIC
+        );
     }
 
     @Transactional

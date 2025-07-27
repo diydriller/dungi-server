@@ -101,13 +101,7 @@ public class TodoController {
                                 .size(size)
                                 .build()
                 ).stream()
-                .map(t -> GetRepeatTodoResponseDto.builder()
-                        .todoId(t.getTodoId())
-                        .todo(t.getTodo())
-                        .deadline(DateTimeFormatter.ofPattern("HH/mm").format(t.getDeadline()))
-                        .isOwner(t.getUserId().equals(user.getId()))
-                        .day(t.getDay())
-                        .build()
+                .map(t -> GetRepeatTodoResponseDto.of(t, user.getId())
                 ).collect(Collectors.toList());
         return new BaseResponse<>(repeatTodoList);
     }

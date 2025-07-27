@@ -7,11 +7,6 @@ import java.time.LocalTime;
 import static java.time.temporal.ChronoField.DAY_OF_WEEK;
 
 public class TimeUtil {
-
-    public enum DAY {
-        MON, TUE, WED, THU, FRI , SAT, SUN
-    };
-
     public static final Long SSE_DURATION = 3600000L;
 
     public static String localDateTimeToTimeStr(LocalDateTime time){

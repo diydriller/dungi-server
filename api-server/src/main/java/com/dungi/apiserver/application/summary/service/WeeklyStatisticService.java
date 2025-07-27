@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.WeekFields;
 import java.util.HashMap;
@@ -75,12 +76,12 @@ public class WeeklyStatisticService {
 
     private Map<Integer, Map<Long, Long>> initializeWeeklyTodoCountMap(List<User> memberList) {
         var weeklyTodoCountMap = new HashMap<Integer, Map<Long, Long>>();
-        for (var day : TimeUtil.DAY.values()) {
-            int dayNum = day.ordinal();
+        for (var dayOfWeek : DayOfWeek.values()) {
+            int dayIdx = dayOfWeek.getValue() - 1;
             for (var member : memberList) {
                 var todoCountMap = new HashMap<Long, Long>();
                 todoCountMap.put(member.getId(), 0L);
-                weeklyTodoCountMap.put(dayNum, todoCountMap);
+                weeklyTodoCountMap.put(dayIdx, todoCountMap);
             }
         }
         return weeklyTodoCountMap;

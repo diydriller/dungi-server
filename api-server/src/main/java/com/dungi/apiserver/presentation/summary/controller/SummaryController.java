@@ -3,6 +3,8 @@ package com.dungi.apiserver.presentation.summary.controller;
 import com.dungi.apiserver.application.summary.service.NoticeVoteService;
 import com.dungi.apiserver.application.summary.service.WeeklyStatisticService;
 import com.dungi.apiserver.presentation.summary.dto.GetNoticeVoteResponseDto;
+import com.dungi.apiserver.presentation.summary.dto.GetWeeklyTodoCountResponseDto;
+import com.dungi.apiserver.presentation.summary.dto.GetWeeklyTopUserResponseDto;
 import com.dungi.common.dto.PageDto;
 import com.dungi.common.response.BaseResponse;
 import com.dungi.core.domain.user.model.User;
@@ -43,5 +45,34 @@ public class SummaryController {
                 .map(nv -> GetNoticeVoteResponseDto.of(nv, user.getId())
                 ).collect(Collectors.toList());
         return new BaseResponse<>(noticeVoteList);
+    }
+
+    @GetMapping(value = "/room/{roomId}/weekly-todo-count")
+    public BaseResponse<?> getWeeklyTodoCount(
+            @PathVariable Long roomId
+    ) {
+        var weeklyTodoCountDto = weeklyStatisticService.getWeeklyTodoCount(roomId);
+        return new BaseResponse<>(
+                GetWeeklyTodoCountResponseDto.from(
+                        weeklyTodoCountDto.getMemberInfoList(),
+                        weeklyTodoCountDto.getWeeklyTodoCountMap()
+                )
+        );
+    }
+
+    @GetMapping(value = "/room/{roomId}/weekly-todo-user")
+    public BaseResponse<?> getWeeklyTopUser(
+            @PathVariable Long roomId
+    ) {
+        var userList = weeklyStatisticService.getWeeklyTopUser(roomId);
+        return new BaseResponse<>(
+                userList.stream().map(
+                        user -> GetWeeklyTopUserResponseDto.builder()
+                                .memberId(user.getId())
+                                .memberNickname(user.getNickname())
+                                .memberImageUrl(user.getProfileImg())
+                                .build()
+                )
+        );
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.time.format.DateTimeFormatter;
 import java.util.stream.Collectors;
 
 import static com.dungi.common.response.BaseResponseStatus.SUCCESS;
@@ -103,7 +104,7 @@ public class TodoController {
                 .map(t -> GetRepeatTodoResponseDto.builder()
                         .todoId(t.getTodoId())
                         .todo(t.getTodo())
-                        .deadline(t.getDeadline().getHour() + "/" + t.getDeadline().getMinute())
+                        .deadline(DateTimeFormatter.ofPattern("HH/mm").format(t.getDeadline()))
                         .isOwner(t.getUserId().equals(user.getId()))
                         .day(t.getDay())
                         .build()

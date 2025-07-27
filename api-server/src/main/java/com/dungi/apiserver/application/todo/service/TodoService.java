@@ -5,10 +5,10 @@ import com.dungi.apiserver.application.todo.dto.CreateTodayTodoDto;
 import com.dungi.apiserver.application.todo.dto.GetRepeatTodoDto;
 import com.dungi.common.dto.PageDto;
 import com.dungi.common.util.TimeUtil;
-import com.dungi.core.domain.todo.model.RepeatDay;
 import com.dungi.core.domain.todo.model.RepeatTodo;
 import com.dungi.core.domain.todo.model.TodayTodo;
 import com.dungi.core.domain.todo.model.Todo;
+import com.dungi.core.domain.todo.util.RepeatDayUtil;
 import com.dungi.core.domain.user.model.User;
 import com.dungi.core.integration.message.common.MessagePublisher;
 import com.dungi.core.integration.store.room.RoomStore;
@@ -54,7 +54,7 @@ public class TodoService {
                 .roomId(roomId)
                 .userId(userId)
                 .build();
-        todoStore.saveRepeatTodo(repeatTodo, dayStrToRepeatDay(dto.getDays()));
+        todoStore.saveRepeatTodo(repeatTodo, RepeatDayUtil.fromBinaryString(dto.getDays()));
     }
 
     // 오늘 할일 조회 기능
@@ -75,7 +75,7 @@ public class TodoService {
                         .todo(rt.getTodoItem())
                         .todoId(rt.getId())
                         .deadline(rt.getDeadline())
-                        .day(repeatDayTodayStr(rt.getRepeatDayList()))
+                        .day(RepeatDayUtil.toBinaryString(rt.getRepeatDayList()))
                         .userId(rt.getUserId())
                         .build()
                 ).collect(Collectors.toList());
@@ -119,25 +119,5 @@ public class TodoService {
 
     @Transactional
     public void complimentMember(Long senderId, Long receiverId) {
-    }
-
-    private List<RepeatDay> dayStrToRepeatDay(String days) {
-        List<RepeatDay> repeatDayList = new ArrayList<>();
-        for (TimeUtil.DAY day : TimeUtil.DAY.values()) {
-            int dayNum = day.ordinal();
-            if (days.charAt(dayNum) == '1') {
-                var repeatDay = new RepeatDay(dayNum);
-                repeatDayList.add(repeatDay);
-            }
-        }
-        return repeatDayList;
-    }
-
-    private String repeatDayTodayStr(List<RepeatDay> repeatDayList) {
-        StringBuilder sb = new StringBuilder("0000000");
-        for (RepeatDay repeatDay : repeatDayList) {
-            sb.setCharAt(repeatDay.getDay(), '1');
-        }
-        return sb.toString();
     }
 }

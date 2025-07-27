@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.temporal.WeekFields;
 
 import static com.dungi.common.util.StringUtil.SAVE_NOTICE_VOTE_TOPIC;
+import static com.dungi.common.util.StringUtil.UPDATE_WEEKLY_TODO_TOPIC;
 
 @RequiredArgsConstructor
 @Component
@@ -35,7 +36,7 @@ public class SummaryKafkaMessageListener {
         );
     }
 
-    @KafkaListener(topics = "update-weekly-todo-count", groupId = "summary-group")
+    @KafkaListener(topics = UPDATE_WEEKLY_TODO_TOPIC, groupId = "summary-group")
     public void updateWeeklyTodoCount(UpdateWeeklyTodoCountEvent event) {
         var now = LocalDate.now();
         var weekFields = WeekFields.ISO;

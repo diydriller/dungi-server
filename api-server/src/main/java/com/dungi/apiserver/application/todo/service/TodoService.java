@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.dungi.common.util.StringUtil.UPDATE_WEEKLY_TODO_TOPIC;
+
 
 @Service
 @AllArgsConstructor
@@ -122,7 +124,7 @@ public class TodoService {
                         .userId(userId)
                         .roomId(roomId)
                         .build(),
-                "update-weekly-todo-count"
+                UPDATE_WEEKLY_TODO_TOPIC
         );
     }
 

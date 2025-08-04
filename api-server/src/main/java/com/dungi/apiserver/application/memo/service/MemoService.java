@@ -12,7 +12,6 @@ import com.dungi.core.integration.store.room.RoomStore;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +22,6 @@ import java.util.List;
 public class MemoService {
     private final MemoStore memoStore;
     private final RoomStore roomStore;
-    private final SimpMessagingTemplate messagingTemplate;
 
     // 메모 생성 기능
     // 유저가 방에 입장해있는지 확인 - 메모 생성
@@ -61,9 +59,7 @@ public class MemoService {
     public void updateMemo(UpdateMemoDto dto, Long roomId, Long userId, Long memoId) {
         roomStore.getRoomEnteredByUser(userId, roomId);
         var memo = memoStore.getMemo(memoId);
-        if (memo.getId().equals(memoId)) {
-            throw new BaseException(BaseResponseStatus.AUTHORIZATION_ERROR);
-        }
+        checkAuthorization(memo, userId);
         memo.updateMemo(dto.getMemo(), dto.getMemoColor());
     }
 
@@ -87,9 +83,13 @@ public class MemoService {
     public void deleteMemo(Long roomId, Long userId, Long memoId) {
         roomStore.getRoomEnteredByUser(userId, roomId);
         var memo = memoStore.getMemo(memoId);
-        if (memo.getId().equals(memoId)) {
+        checkAuthorization(memo, userId);
+        memo.deactivate();
+    }
+
+    private void checkAuthorization(Memo memo, Long userId) {
+        if (!memo.getUserId().equals(userId)) {
             throw new BaseException(BaseResponseStatus.AUTHORIZATION_ERROR);
         }
-        memo.deactivate();
     }
 }

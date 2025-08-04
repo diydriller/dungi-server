@@ -75,7 +75,7 @@ public class MemoController {
                 memoRequestDto.getMemoId()
         );
         var response = MoveMemoResponseDto.fromEntity(movedMemo);
-        messagingTemplate.convertAndSend("/topic/room/$roomId/move-memo", response);
+        messagingTemplate.convertAndSend("/topic/room/" + memoRequestDto.getRoomId() + "/move-memo", response);
     }
 
     @DeleteMapping("/room/{roomId}/memo/{memoId}")

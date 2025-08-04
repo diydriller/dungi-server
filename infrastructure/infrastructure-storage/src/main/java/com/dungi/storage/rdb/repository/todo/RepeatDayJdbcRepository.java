@@ -23,7 +23,7 @@ public class RepeatDayJdbcRepository {
                 new BatchPreparedStatementSetter() {
                     @Override
                     public void setValues(PreparedStatement ps, int i) throws SQLException {
-                        ps.setInt(1, repeatDayList.get(i).getDay());
+                        ps.setInt(1, repeatDayList.get(i).getDayOfWeek().getValue());
                         ps.setLong(2, repeatDayList.get(i).getRepeatTodo().getId());
                     }
 

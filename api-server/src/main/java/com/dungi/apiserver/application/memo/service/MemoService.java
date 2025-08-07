@@ -3,23 +3,28 @@ package com.dungi.apiserver.application.memo.service;
 import com.dungi.apiserver.application.memo.dto.CreateMemoDto;
 import com.dungi.apiserver.application.memo.dto.MoveMemoDto;
 import com.dungi.apiserver.application.memo.dto.UpdateMemoDto;
+import com.dungi.common.event.MemoEditEvent;
 import com.dungi.common.exception.BaseException;
 import com.dungi.common.response.BaseResponseStatus;
 import com.dungi.core.domain.memo.model.Memo;
 import com.dungi.core.domain.memo.query.MemoDetail;
 import com.dungi.core.integration.store.memo.MemoStore;
 import com.dungi.core.integration.store.room.RoomStore;
+import com.dungi.message.redis.publisher.RedisPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.dungi.common.util.StringUtil.MEMO_EDIT_CHANNEL;
+
 @Service
 @RequiredArgsConstructor
 public class MemoService {
     private final MemoStore memoStore;
     private final RoomStore roomStore;
+    private final RedisPublisher publisher;
 
     // 메모 생성 기능
     // 유저가 방에 입장해있는지 확인 - 메모 생성
@@ -53,6 +58,17 @@ public class MemoService {
         var memo = memoStore.getMemo(memoId);
         checkAuthorization(memo, userId);
         memo.updateMemo(dto.getMemo(), dto.getMemoColor());
+
+        publisher.publish(MEMO_EDIT_CHANNEL,
+                MemoEditEvent.builder()
+                        .memoId(memo.getId())
+                        .memoColor(dto.getMemoColor())
+                        .xPosition(memo.getXPosition())
+                        .yPosition(memo.getYPosition())
+                        .memoItem(dto.getMemo())
+                        .roomId(roomId)
+                        .build()
+        );
     }
 
     // 메모 이동 기능
@@ -62,6 +78,17 @@ public class MemoService {
         roomStore.getRoomEnteredByUser(userId, roomId);
         var memo = memoStore.getMemo(memoId);
         memo.move(dto.getX(), dto.getY());
+
+        publisher.publish(MEMO_EDIT_CHANNEL,
+                MemoEditEvent.builder()
+                        .memoId(memo.getId())
+                        .memoColor(memo.getMemoColor())
+                        .xPosition(dto.getX())
+                        .yPosition(dto.getY())
+                        .memoItem(memo.getMemoItem())
+                        .roomId(roomId)
+                        .build()
+        );
         return memo;
     }
 

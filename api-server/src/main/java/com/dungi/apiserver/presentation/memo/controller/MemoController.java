@@ -1,12 +1,14 @@
 package com.dungi.apiserver.presentation.memo.controller;
 
 import com.dungi.apiserver.application.memo.service.MemoService;
-import com.dungi.apiserver.presentation.memo.dto.*;
+import com.dungi.apiserver.presentation.memo.dto.CreateMemoRequestDto;
+import com.dungi.apiserver.presentation.memo.dto.GetMemoResponseDto;
+import com.dungi.apiserver.presentation.memo.dto.MoveMemoRequestDto;
+import com.dungi.apiserver.presentation.memo.dto.UpdateMemoRequestDto;
 import com.dungi.common.response.BaseResponse;
 import com.dungi.core.domain.user.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
@@ -19,7 +21,6 @@ import static com.dungi.common.util.StringUtil.LOGIN_USER;
 @RequiredArgsConstructor
 public class MemoController {
     private final MemoService memoService;
-    private final SimpMessagingTemplate messagingTemplate;
 
     @PostMapping("/room/{roomId}/memo")
     BaseResponse<?> createMemo(
@@ -68,14 +69,12 @@ public class MemoController {
     void moveMemo(
             @Valid MoveMemoRequestDto memoRequestDto
     ) {
-        var movedMemo = memoService.moveMemo(
+        memoService.moveMemo(
                 memoRequestDto.createMemoDto(),
                 memoRequestDto.getRoomId(),
                 memoRequestDto.getUserId(),
                 memoRequestDto.getMemoId()
         );
-        var response = MoveMemoResponseDto.fromEntity(movedMemo);
-        messagingTemplate.convertAndSend("/topic/room/" + memoRequestDto.getRoomId() + "/move-memo", response);
     }
 
     @DeleteMapping("/room/{roomId}/memo/{memoId}")

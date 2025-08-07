@@ -3,6 +3,8 @@ package com.dungi.apiserver.application.memo.service;
 import com.dungi.apiserver.application.memo.dto.CreateMemoDto;
 import com.dungi.apiserver.application.memo.dto.MoveMemoDto;
 import com.dungi.apiserver.application.memo.dto.UpdateMemoDto;
+import com.dungi.common.event.MemoCreateEvent;
+import com.dungi.common.event.MemoDeleteEvent;
 import com.dungi.common.event.MemoEditEvent;
 import com.dungi.common.exception.BaseException;
 import com.dungi.common.response.BaseResponseStatus;
@@ -17,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.dungi.common.util.StringUtil.MEMO_EDIT_CHANNEL;
+import static com.dungi.common.util.StringUtil.*;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +42,17 @@ public class MemoService {
                 .memoColor(dto.getMemoColor())
                 .build();
         memoStore.saveMemo(memo);
+
+        publisher.publish(MEMO_CREATE_CHANNEL,
+                MemoCreateEvent.builder()
+                        .memoId(memo.getId())
+                        .memoColor(memo.getMemoColor())
+                        .xPosition(memo.getXPosition())
+                        .yPosition(memo.getYPosition())
+                        .memoItem(memo.getMemoItem())
+                        .roomId(roomId)
+                        .build()
+        );
     }
 
     // 메모 조회 기능
@@ -100,6 +113,13 @@ public class MemoService {
         var memo = memoStore.getMemo(memoId);
         checkAuthorization(memo, userId);
         memo.deactivate();
+
+        publisher.publish(MEMO_DELETE_CHANNEL,
+                MemoDeleteEvent.builder()
+                        .memoId(memo.getId())
+                        .roomId(roomId)
+                        .build()
+        );
     }
 
     private void checkAuthorization(Memo memo, Long userId) {

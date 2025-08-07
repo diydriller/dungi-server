@@ -6,10 +6,6 @@ bootJar {
 }
 
 dependencies {
-    implementation project(':common')
-    implementation project(':domain-core')
-    implementation project(':infrastructure:infrastructure-redis-config')
-    implementation 'org.springframework.kafka:spring-kafka'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 }

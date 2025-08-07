@@ -9,3 +9,5 @@ include 'infrastructure:infrastructure-file'
 include 'infrastructure:infrastructure-sns'
 include 'infrastructure:infrastructure-storage'
 include 'infrastructure:infrastructure-message'
+include 'infrastructure:infrastructure-redis-config'
+

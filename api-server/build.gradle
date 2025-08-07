@@ -13,6 +13,7 @@ dependencies {
     implementation project(':infrastructure:infrastructure-file')
     implementation project(':infrastructure:infrastructure-storage')
     implementation project(':infrastructure:infrastructure-message')
+    implementation project(':infrastructure:infrastructure-redis-config')
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.session:spring-session-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -24,10 +25,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
     implementation 'org.springframework.security:spring-security-crypto'
-    implementation("org.springframework.boot:spring-boot-starter-websocket")
-    testImplementation("org.testcontainers:testcontainers:1.19.0")
-    testImplementation("org.testcontainers:junit-jupiter:1.19.0")
-    testImplementation("org.testcontainers:mysql:1.19.0")
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'io.projectreactor.netty:reactor-netty:1.0.0'
+    testImplementation 'org.testcontainers:testcontainers:1.19.0'
+    testImplementation 'org.testcontainers:junit-jupiter:1.19.0'
+    testImplementation 'org.testcontainers:mysql:1.19.0'
     implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
 }
 

@@ -14,6 +14,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.JpaCursorItemReader;
+import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,7 +52,7 @@ public class JobConfig {
         return steps.get("decideWeeklyTopUserStep")
                 .<Room, Room>chunk(CHUNK_SIZE)
                 .reader(decideWeeklyTopUserReader())
-                .writer(decideWeeklyTopUserListWriter(dataSource))
+                .writer(decideWeeklyTopUserListWriter(weeklyTopUserWriter(dataSource)))
                 .build();
     }
 
@@ -69,9 +70,8 @@ public class JobConfig {
     }
 
     @Bean
-    public ItemWriter<Room> decideWeeklyTopUserListWriter(DataSource dataSource) {
+    public ItemWriter<Room> decideWeeklyTopUserListWriter(JdbcBatchItemWriter<WeeklyTopUser> weeklyTopUserWriter) {
         return items -> {
-            userStore.getUserById(1L);
             List<WeeklyTopUser> flatList = items.parallelStream()
                     .map(room -> {
                         var lastWeekDate = LocalDate.now().minusWeeks(1);
@@ -91,14 +91,17 @@ public class JobConfig {
                     }).flatMap(List::stream)
                     .collect(Collectors.toList());
 
-            JdbcBatchItemWriter<WeeklyTopUser> writer = new JdbcBatchItemWriter<>();
-            writer.setDataSource(dataSource);
-            writer.setSql("INSERT INTO weekly_top_user (created_time, modified_time, room_id, user_id, week_of_year, year) VALUES (now(), now(), :roomId, :userId, :weekOfYear, :year)");
-            writer.setItemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>());
-            writer.afterPropertiesSet();
-
-            writer.write(flatList);
+            weeklyTopUserWriter.write(flatList);
         };
+    }
+
+    @Bean
+    public JdbcBatchItemWriter<WeeklyTopUser> weeklyTopUserWriter(DataSource dataSource) {
+        return new JdbcBatchItemWriterBuilder<WeeklyTopUser>()
+                .dataSource(dataSource)
+                .sql("INSERT INTO weekly_top_user (created_time, modified_time, room_id, user_id, week_of_year, year) VALUES (now(), now(), :roomId, :userId, :weekOfYear, :year)")
+                .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
+                .build();
     }
 }
 

@@ -1,0 +1,26 @@
+spring:
+  # mysql 연결 설정
+  datasource:
+    source:
+      url: jdbc:mysql://host.docker.internal:3300/spring_dungi?rewriteBatchedStatements=true
+      username: ENC(H02XFv8kQYcw+JabYK2PWA==)
+      password: ENC(MKcemwLpfYeOL+VwyFG48HMhSOUdhSn9)
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      hikari:
+        maximum-pool-size: 10
+
+  # jpa 설정
+  jpa:
+    database: mysql
+    hibernate:
+      ddl-auto: validate
+    generate-ddl: true
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 100
+
+  # batch 설정
+  batch:
+    initialize-schema: always

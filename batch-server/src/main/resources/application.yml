@@ -1,0 +1,15 @@
+server:
+  port: 10001
+
+spring:
+  application:
+    name: BATCH
+
+  # 프로필 설정
+  profiles:
+    active: local
+
+# jasypt 설정
+jasypt:
+  encryptor:
+    password: ${JASYPT_PASSWORD}

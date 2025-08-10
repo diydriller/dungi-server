@@ -19,7 +19,7 @@ public class ScheduleConfig {
 
     private final JobLauncher jobLauncher;
 
-    @Scheduled(cron = "0 10 0 * * 1")
+    @Scheduled(cron = "0 10 0 * * 1", zone = "Asia/Seoul")
     public void executeDecideBestMemberJob() {
         try {
             jobLauncher.run(

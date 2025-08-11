@@ -10,6 +10,7 @@ import com.dungi.core.domain.user.model.User;
 import com.dungi.core.integration.file.FileUploader;
 import com.dungi.core.integration.sms.SmsSender;
 import com.dungi.core.integration.sns.SnsStrategy;
+import com.dungi.core.integration.store.user.AuthStore;
 import com.dungi.core.integration.store.user.UserStore;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,19 +28,22 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final FileUploader fileUploader;
     private final UserStore userStore;
+    private final AuthStore authStore;
     private final SmsSender smsSender;
     private final Map<SnsProvider, SnsStrategy> snsStrategyMap;
 
     public UserService(
-            List<SnsStrategy> snsStrategyList,
             PasswordEncoder passwordEncoder,
             FileUploader fileUploader,
             UserStore userStore,
-            SmsSender smsSender
+            AuthStore authStore,
+            SmsSender smsSender,
+            List<SnsStrategy> snsStrategyList
     ) {
         this.passwordEncoder = passwordEncoder;
         this.fileUploader = fileUploader;
         this.userStore = userStore;
+        this.authStore = authStore;
         this.smsSender = smsSender;
         this.snsStrategyMap = snsStrategyList.stream()
                 .collect(Collectors.toMap(SnsStrategy::getServiceType, snsStrategy -> snsStrategy));
@@ -70,7 +74,7 @@ public class UserService {
     public void sendSms(String phoneNumber) {
         String randomNumber = StringUtil.randomNumber();
         String trimmedPhoneNumber = StringUtil.trimPhoneNumber(phoneNumber);
-        userStore.saveCode(trimmedPhoneNumber, randomNumber, CODE_DURATION);
+        authStore.saveSmsCode(trimmedPhoneNumber, randomNumber, CODE_DURATION);
         smsSender.sendSms(trimmedPhoneNumber, randomNumber);
     }
 
@@ -79,7 +83,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public void compareCode(String code, String phoneNumber) {
         String trimmedPhoneNumber = StringUtil.trimPhoneNumber(phoneNumber);
-        String savedCode = userStore.getCode(trimmedPhoneNumber);
+        String savedCode = authStore.getSmsCode(trimmedPhoneNumber);
         if (!savedCode.equals(code)) {
             throw new BaseException(CODE_NOT_EQUAL);
         }

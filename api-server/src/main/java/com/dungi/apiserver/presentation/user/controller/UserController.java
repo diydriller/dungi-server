@@ -5,7 +5,7 @@ import com.dungi.apiserver.presentation.user.dto.*;
 import com.dungi.apiserver.web.TokenProvider;
 import com.dungi.common.response.BaseResponse;
 import com.dungi.common.value.SnsProvider;
-import com.dungi.core.integration.store.user.UserStore;
+import com.dungi.core.integration.store.user.AuthStore;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -19,10 +19,9 @@ import static com.dungi.common.util.StringUtil.LOGIN_USER;
 @RestController
 @RequiredArgsConstructor
 public class UserController {
-
     private final UserService userService;
     private final TokenProvider tokenProvider;
-    private final UserStore userStore;
+    private final AuthStore authStore;
 
     @PostMapping(
             value = "/user",
@@ -89,7 +88,7 @@ public class UserController {
         session.setAttribute(LOGIN_USER, user);
         String accessToken = tokenProvider.createAccessToken(user.getEmail());
         String refreshToken = tokenProvider.createRefreshToken();
-        userStore.saveToken(refreshToken, user.getEmail(), tokenProvider.getExpirationDuration(refreshToken));
+        authStore.saveRefreshToken(refreshToken, user.getEmail(), tokenProvider.getExpirationDuration(refreshToken));
         return new BaseResponse<>(
                 TokenResponseDto.builder()
                         .accessToken(accessToken)
@@ -106,7 +105,7 @@ public class UserController {
         session.setAttribute(LOGIN_USER, user);
         String accessToken = tokenProvider.createAccessToken(user.getEmail());
         String refreshToken = tokenProvider.createRefreshToken();
-        userStore.saveToken(refreshToken, user.getEmail(), tokenProvider.getExpirationDuration(refreshToken));
+        authStore.saveRefreshToken(refreshToken, user.getEmail(), tokenProvider.getExpirationDuration(refreshToken));
         return new BaseResponse<>(
                 TokenResponseDto.builder()
                         .accessToken(accessToken)
@@ -118,9 +117,9 @@ public class UserController {
     public BaseResponse<?> refresh(
             @RequestBody @Valid RefreshTokenRequestDto requestDto
     ) {
-        String refreshToken = requestDto.getRefresh_token();
-        var email = userStore.getInfo(refreshToken);
-        String accessToken = tokenProvider.createAccessToken(email);
+        var refreshToken = requestDto.getRefresh_token();
+        var email = authStore.validateRefreshTokenAndGetEmail(refreshToken);
+        var accessToken = tokenProvider.createAccessToken(email);
         return new BaseResponse<>(
                 TokenResponseDto.builder()
                         .accessToken(accessToken)

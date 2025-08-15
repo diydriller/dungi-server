@@ -8,3 +8,5 @@
 ## 이슈
 * [Spring Batch 개선](https://develop-think-record.tistory.com/13)
 * [Websocket STOMP 사용](https://develop-think-record.tistory.com/24)
+* [Strategy Pattern 사용](https://develop-think-record.tistory.com/26)
+* [Refresh Token 사용](https://develop-think-record.tistory.com/25)

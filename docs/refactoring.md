@@ -1,0 +1,32 @@
+- magic literal을 상수로 변경하기
+    - 문자열
+        - https://github.com/diydriller/dungi-server/pull/4/commits/0d0ebdbf3b948245d29d09d67edcbd3fc7e876a1
+        - https://github.com/diydriller/dungi-server/pull/8/commits/beb76b47a0ce77e83294c8aece399c7fc1084302
+        - https://github.com/diydriller/dungi-server/pull/14/commits/35ddb752afd774e79925fb524a5d214b6b4b67a7
+        - https://github.com/diydriller/dungi-server/pull/18/commits/da9c49df4ff53aeb1972007771aadb698ea519e8
+- 하나에 여러 기능이 있을 경우 분리하기
+    - 인터페이스 분리
+        - https://github.com/diydriller/dungi-server/pull/8/commits/64c154f3b3946a3ffbf409ce26c190ccbfec3b32
+    - 메서드 분리
+        - https://github.com/diydriller/dungi-server/pull/14/commits/7c5940266f985e7c3293e499ec2a1966671ac662
+        - https://github.com/diydriller/dungi-server/pull/20/commits/3b7838cccc8880373952bbe90e9db21dbe31b60b
+- null point exception이 발생 가능한 경우 null 처리하기
+    - optional로 감싸고 optional 메서드 사용하기
+        - https://github.com/diydriller/dungi-server/pull/4/commits/9904d1848c786d8012f8ec8143fb89f3c73ddf34
+- inner class를 사용할 경우 outer class를 참조하지 않는다면 static으로 선언하기
+    - https://github.com/diydriller/dungi-server/pull/8/commits/3bcd454ded76f0e11d231740caea30387e333b09
+- 도메인 중심으로 로직 개선하기
+    - https://github.com/diydriller/dungi-server/pull/12/commits/6d61cbc38c2e5fc1de0fa43034cba7293300a6f2
+- 적절한 메서드로 변경하기
+    - 자료구조 관련 메서드
+        - https://github.com/diydriller/dungi-server/pull/14/commits/7aca9b173adf4fcceb2f557397db91b7cdc16e62
+    - 파일 관련 메서드
+        - https://github.com/diydriller/dungi-server/pull/4/commits/5c10ed5f1a342f2d77663f7ace177ef4df122dc8
+- dto 변환 로직은 dto 내부로 이동
+    - https://github.com/diydriller/dungi-server/pull/18/commits/5dd5276490eb0eab63d0b84728009b5fc905f699
+- 적절한 타입으로 변경하기
+    - 날짜
+        - https://github.com/diydriller/dungi-server/pull/18/commits/2f30aaf454fc086c63f4017b6b12b8ffad88cfd5
+- 매번 객체 생성하기보다는 bean으로 관리하기
+    - https://github.com/diydriller/dungi-server/pull/25/commits/8a6f8bddb925d38f7cf36010ec52cbc8ee1d80c1
+    - https://github.com/diydriller/dungi-server/pull/8/commits/da9df839153a59284fb7aebf94c5b364d9801ca8

@@ -1,0 +1,50 @@
+name: dungi server CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: "11"
+          distribution: "temurin"
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew clean build
+
+      - name: Make Directory
+        run: mkdir -p dungi
+
+      - name: Prepare Deployment Directory
+        run: |
+          cp ./api-server/build/libs/*.jar ./dungi
+          cp ./batch-server/build/libs/*.jar ./dungi
+          cp appspec.yml ./dungi
+          cp ./scripts/*.sh ./dungi
+
+      - name: Make zip file
+        run: zip -r ./dungi.zip ./dungi
+        shell: bash
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_ACCESS_KEY_SECRET }}
+          aws-region: ap-northeast-2
+
+      - name: Upload to S3
+        run: aws s3 cp --region ap-northeast-2 ./dungi.zip s3://${{ secrets.AWS_S3_BUCKET_NAME }}

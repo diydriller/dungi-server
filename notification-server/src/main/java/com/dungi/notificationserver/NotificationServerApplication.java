@@ -6,7 +6,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @ComponentScan(basePackages = {
         "com.dungi.notificationserver",
-        "com.dungi.message",
+        "com.dungi.message.kafka.listener.notification",
         "com.dungi.core",
         "com.dungi.common",
         "com.dungi.storage"

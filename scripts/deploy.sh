@@ -1,31 +1,39 @@
 #!/usr/bin/env bash
 
-REPOSITORY=/home/ubuntu/dungi
+REPOSITORY=/home/ubuntu/xircle
+LOG_DIR=$REPOSITORY/logs
+mkdir -p $LOG_DIR
 
-echo "> 현재 구동 중인 애플리케이션 pid 확인"
+echo "> 현재 구동 중인 애플리케이션 종료"
 
-CURRENT_PID=$(pgrep -fla java | grep hayan | awk '{print $1}')
+SERVICES=("api-server" "batch-server" "notification-server")
 
-echo "현재 구동 중인 애플리케이션 pid: $CURRENT_PID"
+for SERVICE in "${SERVICES[@]}"
+do
+  echo "> $SERVICE 종료 시도"
+  CURRENT_PID=$(pgrep -f "$SERVICE" | awk '{print $1}')
 
-if [ -z "$CURRENT_PID" ]; then
-  echo "현재 구동 중인 애플리케이션이 없으므로 종료하지 않습니다."
-else
-  echo "> kill -15 $CURRENT_PID"
-  kill -15 $CURRENT_PID
-  sleep 5
-fi
+  if [ -z "$CURRENT_PID" ]; then
+    echo ">> $SERVICE 구동 중인 프로세스 없음"
+  else
+    echo ">> kill -15 $CURRENT_PID"
+    kill -15 $CURRENT_PID
+    sleep 5
+  fi
+done
 
 echo "> 새 애플리케이션 배포"
 
-JAR_NAME=$(ls -tr $REPOSITORY/*SNAPSHOT.jar | tail -n 1)
+for SERVICE in "${SERVICES[@]}"
+do
+  JAR_NAME=$(ls -tr $REPOSITORY/$SERVICE*-SNAPSHOT.jar | tail -n 1)
 
-echo "> JAR NAME: $JAR_NAME"
-
-echo "> $JAR_NAME 에 실행권한 추가"
-
-chmod +x $JAR_NAME
-
-echo "> $JAR_NAME 실행"
-
-nohup java -jar -Duser.timezone=Asia/Seoul $JAR_NAME >> $REPOSITORY/nohup.out 2>&1 &
+  if [ -f "$JAR_NAME" ]; then
+    echo ">> $SERVICE 실행: $JAR_NAME"
+    chmod +x $JAR_NAME
+    nohup java -jar -Duser.timezone=Asia/Seoul $JAR_NAME \
+      >> $LOG_DIR/$SERVICE.log 2>&1 &
+  else
+    echo ">> $SERVICE JAR 파일 없음, 실행 건너뜀"
+  fi
+done

@@ -5,6 +5,8 @@ import com.dungi.apiserver.application.todo.dto.CreateTodayTodoDto;
 import com.dungi.apiserver.application.todo.dto.GetRepeatTodoDto;
 import com.dungi.common.dto.PageDto;
 import com.dungi.common.util.TimeUtil;
+import com.dungi.core.domain.common.value.NotificationType;
+import com.dungi.core.domain.notification.query.NotificationDetail;
 import com.dungi.core.domain.summary.event.UpdateWeeklyTodoCountEvent;
 import com.dungi.core.domain.todo.model.RepeatTodo;
 import com.dungi.core.domain.todo.model.TodayTodo;
@@ -22,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.dungi.common.util.StringUtil.NOTIFICATION_TOPIC;
 import static com.dungi.common.util.StringUtil.UPDATE_WEEKLY_TODO_TOPIC;
 
 
@@ -130,5 +133,13 @@ public class TodoService {
 
     @Transactional
     public void complimentMember(Long senderId, Long receiverId) {
+        messagePublisher.publish(
+                NotificationDetail.builder()
+                        .senderId(senderId)
+                        .receiverId(receiverId)
+                        .type(NotificationType.COMPLIMENT)
+                        .build(),
+                NOTIFICATION_TOPIC
+        );
     }
 }

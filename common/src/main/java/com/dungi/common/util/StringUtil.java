@@ -12,6 +12,7 @@ public class StringUtil {
     public static final String FILE_PREFIX = "dungi-image";
     public static final String SAVE_NOTICE_VOTE_TOPIC = "save-notice-vote";
     public static final String UPDATE_WEEKLY_TODO_TOPIC = "update-weekly-todo-count";
+    public static final String NOTIFICATION_TOPIC = "notification";
     public static final String MEMO_EDIT_CHANNEL = "memo-edit";
     public static final String MEMO_CREATE_CHANNEL = "memo-create";
     public static final String MEMO_DELETE_CHANNEL = "memo-delete";

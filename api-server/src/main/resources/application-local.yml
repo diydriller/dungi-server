@@ -45,7 +45,7 @@ redis:
 message:
   kind: kafka
 kafka:
-  broker: host.docker.internal:29092
+  broker: host.docker.internal:9092
 
 file:
   kind: local

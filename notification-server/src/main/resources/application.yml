@@ -1,0 +1,16 @@
+# 서버 설정
+server:
+  port: 11000
+
+spring:
+  application:
+    name: NOTIFICATION
+
+  # 프로필 설정
+  profiles:
+    active: local
+
+jasypt:
+  encryptor:
+    password: ${JASYPT_PASSWORD}
+

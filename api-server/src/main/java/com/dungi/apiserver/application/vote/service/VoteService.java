@@ -28,10 +28,8 @@ public class VoteService {
     private final RoomStore roomStore;
     private final MessagePublisher messagePublisher;
 
-    // 투표 생성 기능
-    // 방에 유저 있는지 조회 - 투표 생성 - 조회용 테이블 데이터 생성
     @Transactional
-    public void createVote(CreateVoteDto dto, Long userId, Long roomId) {
+    public Vote createVote(CreateVoteDto dto, Long userId, Long roomId) {
         roomStore.getRoomEnteredByUser(userId, roomId);
 
         var vote = Vote.builder()
@@ -55,10 +53,9 @@ public class VoteService {
                         .build(),
                 SAVE_NOTICE_VOTE_TOPIC
         );
+        return savedVote;
     }
 
-    // 투표 조회 기능
-    // 방에 유저 있는지 조회 - 투표 조회 - 투표 선택지와 투표한 사람들 조회 - 투표 안한 수 조회
     @Transactional(readOnly = true)
     public VoteItemInfo getVote(Long roomId, Long userId, Long voteId) {
 
@@ -82,22 +79,22 @@ public class VoteService {
                 .build();
     }
 
-    // 투표 하기 기능
-    // 투표 선택지 조회 - 투표하기
     @Transactional
-    public void createVoteChoice(Long roomId, Long userId, Long voteId, Long choiceId) {
+    public UserVoteItem createVoteChoice(Long roomId, Long userId, Long voteId, Long choiceId) {
         roomStore.getRoomEnteredByUser(userId, roomId);
         var voteItem = voteStore.getVoteItem(choiceId, voteId);
-        voteStore.getVoteChoice(userId, voteItem)
-                .ifPresentOrElse(
-                        (userVoteItem) -> {
-                            userVoteItem.changeChoice();
-                            voteStore.saveUserVoteChoice(userVoteItem);
-                        }, () -> {
-                            var userVoteItem = new UserVoteItem(userId, voteItem);
-                            voteStore.saveUserVoteChoice(userVoteItem);
-                        }
-                );
+        
+        return voteStore.getVoteChoice(userId, voteItem)
+                .map(userVoteItem -> {
+                    userVoteItem.changeChoice();
+                    voteStore.saveUserVoteChoice(userVoteItem);
+                    return userVoteItem;
+                })
+                .orElseGet(() -> {
+                    var userVoteItem = new UserVoteItem(userId, voteItem);
+                    voteStore.saveUserVoteChoice(userVoteItem);
+                    return userVoteItem;
+                });
     }
 
     private static class VoteUserData {

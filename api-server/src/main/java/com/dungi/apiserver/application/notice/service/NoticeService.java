@@ -24,7 +24,7 @@ public class NoticeService {
     // 공지 생성 기능
     // 방에 유저 있는지 조회 - 공지 생성 - 조회용 테이블 데이터 생성
     @Transactional
-    public void createNotice(CreateNoticeDto dto) {
+    public Notice createNotice(CreateNoticeDto dto) {
         roomStore.getRoomEnteredByUser(dto.getUserId(), dto.getRoomId());
 
         var notice = Notice.builder()
@@ -45,5 +45,6 @@ public class NoticeService {
                         .build(),
                 SAVE_NOTICE_VOTE_TOPIC
         );
+        return savedNotice;
     }
 }

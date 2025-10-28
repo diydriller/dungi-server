@@ -2,6 +2,7 @@ package com.dungi.apiserver.presentation.notice.controller;
 
 import com.dungi.apiserver.application.notice.service.NoticeService;
 import com.dungi.apiserver.presentation.notice.dto.CreateNoticeRequestDto;
+import com.dungi.apiserver.presentation.notice.dto.NoticeResponseDto;
 import com.dungi.common.response.BaseResponse;
 import com.dungi.core.domain.user.model.User;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
-import static com.dungi.common.response.BaseResponseStatus.SUCCESS;
 import static com.dungi.common.util.StringUtil.LOGIN_USER;
 
 @RestController
@@ -23,15 +23,15 @@ public class NoticeController {
     private final NoticeService noticeService;
 
     @PostMapping(value = "/room/{roomId}/notice")
-    public BaseResponse<?> createNotice(
+    public BaseResponse<NoticeResponseDto> createNotice(
             @PathVariable Long roomId,
             @RequestBody @Valid CreateNoticeRequestDto noticeRequestDto,
             HttpSession session
     ) {
         var user = (User) session.getAttribute(LOGIN_USER);
-        noticeService.createNotice(
+        var notice = noticeService.createNotice(
                 noticeRequestDto.createNoticeDto(roomId, user.getId())
         );
-        return new BaseResponse<>(SUCCESS);
+        return new BaseResponse<>(NoticeResponseDto.fromNotice(notice));
     }
 }

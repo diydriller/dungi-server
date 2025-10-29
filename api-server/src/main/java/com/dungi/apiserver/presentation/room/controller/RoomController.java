@@ -4,6 +4,7 @@ import com.dungi.apiserver.application.room.service.RoomService;
 import com.dungi.apiserver.presentation.room.dto.CreateRoomRequestDto;
 import com.dungi.apiserver.presentation.room.dto.CreateRoomResponseDto;
 import com.dungi.apiserver.presentation.room.dto.GetRoomResponseDto;
+import com.dungi.apiserver.presentation.room.dto.RoomEnterResponseDto;
 import com.dungi.common.dto.PageDto;
 import com.dungi.common.response.BaseResponse;
 import com.dungi.core.domain.user.model.User;
@@ -38,13 +39,13 @@ public class RoomController {
     }
 
     @PostMapping("/room/{roomId}/member")
-    BaseResponse<?> enterRoom(
+    BaseResponse<RoomEnterResponseDto> enterRoom(
             @PathVariable Long roomId,
             HttpSession session
     ) {
         var user = (User) session.getAttribute(LOGIN_USER);
-        roomService.enterRoom(roomId, user.getId());
-        return new BaseResponse<>(SUCCESS);
+        var room = roomService.enterRoom(roomId, user.getId());
+        return new BaseResponse<>(RoomEnterResponseDto.fromRoom(room, user.getId()));
     }
 
     @DeleteMapping("/room/{roomId}/member")

@@ -19,8 +19,6 @@ import java.util.List;
 public class RoomService {
     private final RoomStore roomStore;
 
-    // 방 생성 기능
-    // 방 저장
     @Transactional
     public Room createRoom(CreateRoomDto dto, Long userId) {
         var room = new Room(dto.getName(), dto.getColor());
@@ -28,10 +26,8 @@ public class RoomService {
         return roomStore.saveRoom(room);
     }
 
-    // 방 입장 기능
-    // 방 유무 확인 - 이전에 퇴장한 유저라면 재입장 or 방 입장
     @Transactional
-    public void enterRoom(Long roomId, Long userId) {
+    public Room enterRoom(Long roomId, Long userId) {
         var room = roomStore.getRoom(roomId);
         var userRoom = roomStore.getUserRoomByDeleteStatus(userId, room, DeleteStatus.DELETED);
         userRoom.ifPresentOrElse(
@@ -41,10 +37,9 @@ public class RoomService {
                     roomStore.saveRoom(room);
                 }
         );
+        return room;
     }
 
-    // 방 퇴장 기능
-    // 방에 유저 있는지 확인 - 방에서 유저 삭제
     @Transactional
     public void leaveRoom(Long roomId, Long userId) {
         var room = roomStore.getRoomEnteredByUser(userId, roomId);
@@ -57,8 +52,6 @@ public class RoomService {
         }
     }
 
-    // 방 조회 기능
-    // 방 조회 - 멤버 정보 조회
     @Transactional(readOnly = true)
     public List<RoomDetail> getAllRoomInfo(PageDto dto) {
         var roomList = roomStore.getAllRoomEnteredByUser(dto);

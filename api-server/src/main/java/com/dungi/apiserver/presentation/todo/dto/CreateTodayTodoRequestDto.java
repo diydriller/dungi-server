@@ -1,6 +1,8 @@
 package com.dungi.apiserver.presentation.todo.dto;
 
 import com.dungi.apiserver.application.todo.dto.CreateTodayTodoDto;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,6 +11,8 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class CreateTodayTodoRequestDto {
 

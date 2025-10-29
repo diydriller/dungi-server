@@ -37,10 +37,11 @@ public class TodoStoreImpl implements TodoStore {
     }
 
     @Override
-    public void saveRepeatTodo(RepeatTodo repeatTodo, List<RepeatDay> repeatDayList) {
+    public RepeatTodo saveRepeatTodo(RepeatTodo repeatTodo, List<RepeatDay> repeatDayList) {
         var savedRepeatTodo = todoJpaRepository.save(repeatTodo);
         repeatDayList.forEach(rd -> rd.setRepeatTodo(savedRepeatTodo));
         repeatDayJdbcRepository.saveAll(repeatDayList);
+        return savedRepeatTodo;
     }
 
     @Override

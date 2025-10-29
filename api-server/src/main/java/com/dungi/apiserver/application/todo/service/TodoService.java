@@ -35,8 +35,6 @@ public class TodoService {
     private final RoomStore roomStore;
     private final MessagePublisher messagePublisher;
 
-    // 오늘 할일 생성 기능
-    // 유저가 방에 입장해있는지 확인 - 오늘 할일 생성
     @Transactional
     public Todo createTodayTodo(CreateTodayTodoDto dto, Long userId, Long roomId) {
         roomStore.getRoomEnteredByUser(userId, roomId);
@@ -49,10 +47,8 @@ public class TodoService {
         return todoStore.saveTodayTodo(todayTodo);
     }
 
-    // 반복 할일 생성 기능
-    // 유저가 방에 입장해있는지 검증 - 반복 할일 생성
     @Transactional
-    public void createRepeatTodo(CreateRepeatTodoDto dto, Long userId, Long roomId) {
+    public RepeatTodo createRepeatTodo(CreateRepeatTodoDto dto, Long userId, Long roomId) {
         roomStore.getRoomEnteredByUser(userId, roomId);
         var repeatTodo = RepeatTodo.builder()
                 .deadline(TimeUtil.timeStrToTodayLocalDateTime(dto.getTime()))
@@ -60,19 +56,15 @@ public class TodoService {
                 .roomId(roomId)
                 .userId(userId)
                 .build();
-        todoStore.saveRepeatTodo(repeatTodo, RepeatDayUtil.fromBinaryString(dto.getDays()));
+        return todoStore.saveRepeatTodo(repeatTodo, RepeatDayUtil.fromBinaryString(dto.getDays()));
     }
 
-    // 오늘 할일 조회 기능
-    // 유저가 방에 입 장해있는지 검증 - 오늘 할일 조회
     @Transactional(readOnly = true)
     public List<TodayTodo> getTodayTodo(PageDto dto) {
         roomStore.getRoomEnteredByUser(dto.getUserId(), dto.getRoomId());
         return todoStore.getTodayTodo(dto);
     }
 
-    // 반복 할일 조회 기능
-    // 유저가 방에 입장해있는지 검증 - 반복 할일 조회
     @Transactional(readOnly = true)
     public List<GetRepeatTodoDto> getRepeatTodo(PageDto dto) {
         roomStore.getRoomEnteredByUser(dto.getUserId(), dto.getRoomId());
@@ -87,7 +79,6 @@ public class TodoService {
                 ).collect(Collectors.toList());
     }
 
-    // 일을 가장 많이 한 멤버 선정 기능
     @Transactional(readOnly = true)
     public List<Long> findBestMember(Long roomId) {
         var room = roomStore.getRoom(roomId);
@@ -114,10 +105,8 @@ public class TodoService {
         return bestMemberList;
     }
 
-    // 오늘 할일 완료 기능
-    // 유저가 방에 입장해있는지 검증 - 마감기한이 지나지 않은 경우 오늘 할일 완료 - 주간 요일별 할일 통계 업데이트
     @Transactional
-    public void completeTodayTodo(Long userId, Long roomId, Long todoId) {
+    public TodayTodo completeTodayTodo(Long userId, Long roomId, Long todoId) {
         roomStore.getRoomEnteredByUser(userId, roomId);
         var todo = todoStore.findTodayTodo(roomId, todoId);
         todo.complete();
@@ -129,6 +118,7 @@ public class TodoService {
                         .build(),
                 UPDATE_WEEKLY_TODO_TOPIC
         );
+        return todo;
     }
 
     @Transactional

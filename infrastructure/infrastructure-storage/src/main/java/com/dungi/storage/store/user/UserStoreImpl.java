@@ -14,8 +14,8 @@ public class UserStoreImpl implements UserStore {
     private final UserJpaRepository userJpaRepository;
 
     @Override
-    public void saveUser(User user) {
-        userJpaRepository.save(user);
+    public User saveUser(User user) {
+        return userJpaRepository.save(user);
     }
 
     @Override

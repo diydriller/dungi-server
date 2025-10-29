@@ -49,10 +49,8 @@ public class UserService {
                 .collect(Collectors.toMap(SnsStrategy::getServiceType, snsStrategy -> snsStrategy));
     }
 
-    // 회원가입 기능
-    // 이메일 중복 여부 - 이미지 업로드 - 비밀번호 암호화 - 유저 저장
     @Transactional
-    public void createUser(CreateUserDto dto) throws Exception {
+    public User createUser(CreateUserDto dto) throws Exception {
         checkEmailPresent(dto.getEmail());
         String imageDownUrl = fileUploader.imageUpload(dto.getImg());
         String hashedPassword = passwordEncoder.encode(dto.getPassword());
@@ -65,11 +63,9 @@ public class UserService {
                 .profileImg(imageDownUrl)
                 .snsProvider(SnsProvider.LOCAL)
                 .build();
-        userStore.saveUser(user);
+        return userStore.saveUser(user);
     }
 
-    // SMS 인증번호 보내기 기능
-    // 인증번호 생성 - 암호화 - 인증번호 저장 - sms 전송
     @Transactional(rollbackFor = Exception.class)
     public void sendSms(String phoneNumber) {
         String randomNumber = StringUtil.randomNumber();
@@ -78,8 +74,6 @@ public class UserService {
         smsSender.sendSms(trimmedPhoneNumber, randomNumber);
     }
 
-    // SMS 인증번호 검증 기능
-    // 인증번호 조회 - 인증번호 비교
     @Transactional(readOnly = true)
     public void compareCode(String code, String phoneNumber) {
         String trimmedPhoneNumber = StringUtil.trimPhoneNumber(phoneNumber);
@@ -89,10 +83,8 @@ public class UserService {
         }
     }
 
-    // SNS 회원가입 기능
-    // 이메일 검증 - 이메일 중복 확인 - 이미지 업로드 - 유저 저장
     @Transactional
-    public void createSnsUser(CreateSnsUserDto dto) throws Exception {
+    public User createSnsUser(CreateSnsUserDto dto) throws Exception {
         var snsStrategy = snsStrategyMap.get(dto.getServiceType());
         String snsEmail = snsStrategy.getSnsEmail(dto.getAccessToken());
         if (!dto.getEmail().equals(snsEmail)) {
@@ -110,11 +102,9 @@ public class UserService {
                 .profileImg(imageDownUrl)
                 .snsProvider(dto.getServiceType())
                 .build();
-        userStore.saveUser(user);
+        return userStore.saveUser(user);
     }
 
-    // 로그인 기능
-    // 이메일 조회 - 비밀번호 일치여부
     @Transactional(readOnly = true)
     public User login(String email, String password) {
         User user = userStore.getUserByEmail(email);
@@ -124,8 +114,6 @@ public class UserService {
         return user;
     }
 
-    // sns 로그인 기능
-    // 이메일 검증 - 이메일 일치여부 - 이메일 조회
     @Transactional(readOnly = true)
     public User snsLogin(SnsLoginDto dto) throws Exception {
         var snsStrategy = snsStrategyMap.get(dto.getServiceType());
@@ -136,13 +124,11 @@ public class UserService {
         return userStore.getUserByEmail(dto.getEmail());
     }
 
-    // sns 토큰 가져오기 메서드
     public String snsToken(String code, SnsProvider serviceType) throws Exception {
         var snsStrategy = snsStrategyMap.get(serviceType);
         return snsStrategy.getSnsToken(code);
     }
 
-    // 이메일 조회 메서드
     public void checkEmailPresent(String email) {
         userStore.checkEmailPresent(email);
     }

@@ -3,6 +3,7 @@ package com.dungi.apiserver.presentation.user.dto;
 import com.dungi.apiserver.application.user.dto.CreateSnsUserDto;
 import com.dungi.common.value.SnsProvider;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotEmpty;
@@ -10,6 +11,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 @Getter
+@Setter
 public class SnsJoinRequestDto {
 
     @NotEmpty(message = "email is empty")

@@ -28,11 +28,11 @@ public class UserController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public BaseResponse<?> join(
+    public BaseResponse<UserResponseDto> join(
             @Valid JoinRequestDto request
     ) throws Exception {
-        userService.createUser(request.createUserDto());
-        return new BaseResponse<>(SUCCESS);
+        var user = userService.createUser(request.createUserDto());
+        return new BaseResponse<>(UserResponseDto.fromUser(user));
     }
 
     @PostMapping("/check/email")
@@ -64,12 +64,12 @@ public class UserController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public BaseResponse<?> kakaoJoin(
+    public BaseResponse<UserResponseDto> kakaoJoin(
             @Valid SnsJoinRequestDto requestDto) throws Exception {
-        userService.createSnsUser(
+        var user = userService.createSnsUser(
                 requestDto.createSnsUserDto()
         );
-        return new BaseResponse<>(SUCCESS);
+        return new BaseResponse<>(UserResponseDto.fromUser(user));
     }
 
     @GetMapping("/kakao/callback")

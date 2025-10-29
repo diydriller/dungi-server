@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserStore {
-    void saveUser(User user);
+    User saveUser(User user);
 
     void checkEmailPresent(String email);
 

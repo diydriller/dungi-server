@@ -49,6 +49,7 @@ public class Memo extends BaseEntity {
 
     @Builder
     public Memo(
+            Long id,
             Long userId,
             Long roomId,
             String memoItem,
@@ -56,6 +57,7 @@ public class Memo extends BaseEntity {
             Double yPosition,
             String memoColor
     ) {
+        this.id = id;
         this.userId = userId;
         this.roomId = roomId;
         this.memoItem = memoItem;
@@ -65,17 +67,19 @@ public class Memo extends BaseEntity {
         this.deleteStatus = DeleteStatus.NOT_DELETED;
     }
 
-    public void updateMemo(String memoItem, String memoColor) {
+    public Memo updateMemo(String memoItem, String memoColor) {
         this.memoItem = memoItem;
         this.memoColor = memoColor;
+        return this;
     }
 
     public void deactivate() {
         this.deleteStatus = DeleteStatus.DELETED;
     }
 
-    public void move(double xPosition, double yPosition) {
+    public Memo move(double xPosition, double yPosition) {
         this.xPosition = xPosition;
         this.yPosition = yPosition;
+        return this;
     }
 }

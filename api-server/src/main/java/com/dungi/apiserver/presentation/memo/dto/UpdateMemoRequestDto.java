@@ -1,13 +1,19 @@
 package com.dungi.apiserver.presentation.memo.dto;
 
 import com.dungi.apiserver.application.memo.dto.UpdateMemoDto;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 
 @Getter
+@Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class UpdateMemoRequestDto {
     @NotEmpty(message = "memo is empty")
     private String memo;

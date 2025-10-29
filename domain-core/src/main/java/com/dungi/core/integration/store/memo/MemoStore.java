@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 public interface MemoStore {
-    void saveMemo(Memo memo);
+    Memo saveMemo(Memo memo);
 
     List<MemoDetail> getAllMemo(Long userId, Long roomId);
 

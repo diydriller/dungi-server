@@ -28,10 +28,8 @@ public class MemoService {
     private final RoomStore roomStore;
     private final RedisPublisher publisher;
 
-    // 메모 생성 기능
-    // 유저가 방에 입장해있는지 확인 - 메모 생성
     @Transactional
-    public void createMemo(CreateMemoDto dto, Long roomId, Long userId) {
+    public Memo createMemo(CreateMemoDto dto, Long roomId, Long userId) {
         roomStore.getRoomEnteredByUser(userId, roomId);
         var memo = Memo.builder()
                 .userId(userId)
@@ -41,51 +39,47 @@ public class MemoService {
                 .yPosition(dto.getYPosition())
                 .memoColor(dto.getMemoColor())
                 .build();
-        memoStore.saveMemo(memo);
+        var savedMemo = memoStore.saveMemo(memo);
 
         publisher.publish(MEMO_CREATE_CHANNEL,
                 MemoCreateEvent.builder()
-                        .memoId(memo.getId())
-                        .memoColor(memo.getMemoColor())
-                        .xPosition(memo.getXPosition())
-                        .yPosition(memo.getYPosition())
-                        .memoItem(memo.getMemoItem())
+                        .memoId(savedMemo.getId())
+                        .memoColor(savedMemo.getMemoColor())
+                        .xPosition(savedMemo.getXPosition())
+                        .yPosition(savedMemo.getYPosition())
+                        .memoItem(savedMemo.getMemoItem())
                         .roomId(roomId)
                         .build()
         );
+        return savedMemo;
     }
 
-    // 메모 조회 기능
-    // 유저가 방에 입장해있는지 검증 - 메모 조회
     @Transactional(readOnly = true)
     public List<MemoDetail> getMemo(Long roomId, Long userId) {
         roomStore.getRoomEnteredByUser(userId, roomId);
         return memoStore.getAllMemo(userId, roomId);
     }
 
-    // 메모 수정 기능
-    // 유저가 방에 입장해있는지 검증 - 메모 수정
     @Transactional
-    public void updateMemo(UpdateMemoDto dto, Long roomId, Long userId, Long memoId) {
+    public Memo updateMemo(UpdateMemoDto dto, Long roomId, Long userId, Long memoId) {
         roomStore.getRoomEnteredByUser(userId, roomId);
         var memo = memoStore.getMemo(memoId);
         checkAuthorization(memo, userId);
-        memo.updateMemo(dto.getMemo(), dto.getMemoColor());
+        var updatedMemo = memo.updateMemo(dto.getMemo(), dto.getMemoColor());
 
         publisher.publish(MEMO_EDIT_CHANNEL,
                 MemoEditEvent.builder()
                         .memoId(memo.getId())
-                        .memoColor(dto.getMemoColor())
+                        .memoColor(updatedMemo.getMemoColor())
                         .xPosition(memo.getXPosition())
                         .yPosition(memo.getYPosition())
-                        .memoItem(dto.getMemo())
+                        .memoItem(updatedMemo.getMemoItem())
                         .roomId(roomId)
                         .build()
         );
+        return updatedMemo;
     }
 
-    // 메모 이동 기능
-    // 유저가 방에 입장해있는지 검증 - 메모 이동
     @Transactional
     public Memo moveMemo(MoveMemoDto dto, Long roomId, Long userId, Long memoId) {
         roomStore.getRoomEnteredByUser(userId, roomId);
@@ -105,8 +99,6 @@ public class MemoService {
         return memo;
     }
 
-    // 메모 삭제 기능
-    // 유저가 방에 입장해있는지 검증 - 메모 삭제
     @Transactional
     public void deleteMemo(Long roomId, Long userId, Long memoId) {
         roomStore.getRoomEnteredByUser(userId, roomId);

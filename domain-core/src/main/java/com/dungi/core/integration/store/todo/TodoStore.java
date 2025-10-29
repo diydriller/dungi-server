@@ -15,7 +15,7 @@ import java.util.List;
 public interface TodoStore {
     Todo saveTodayTodo(TodayTodo todo);
 
-    void saveRepeatTodo(RepeatTodo todo, List<RepeatDay> repeatDayList);
+    RepeatTodo saveRepeatTodo(RepeatTodo todo, List<RepeatDay> repeatDayList);
 
     List<TodayTodo> getTodayTodo(PageDto dto);
 

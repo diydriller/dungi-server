@@ -1,5 +1,6 @@
 package com.dungi.apiserver.presentation.todo.controller;
 
+import com.dungi.apiserver.application.todo.dto.GetRepeatTodoDto;
 import com.dungi.apiserver.application.todo.service.TodoService;
 import com.dungi.apiserver.presentation.todo.dto.*;
 import com.dungi.common.dto.PageDto;
@@ -11,10 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.time.format.DateTimeFormatter;
 import java.util.stream.Collectors;
 
-import static com.dungi.common.response.BaseResponseStatus.SUCCESS;
 import static com.dungi.common.util.StringUtil.LOGIN_USER;
 
 @RestController
@@ -44,18 +43,25 @@ public class TodoController {
     }
 
     @PostMapping("/room/{roomId}/todo/days")
-    BaseResponse<?> createRepeatTodo(
+    BaseResponse<RepeatTodoResponseDto> createRepeatTodo(
             @PathVariable Long roomId,
             @RequestBody @Valid CreateRepeatTodoRequestDto requestDto,
             HttpSession session
     ) {
         var user = (User) session.getAttribute(LOGIN_USER);
-        todoService.createRepeatTodo(
+        var repeatTodo = todoService.createRepeatTodo(
                 requestDto.createRepeatTodoDto(),
                 user.getId(),
                 roomId
         );
-        return new BaseResponse<>(SUCCESS);
+        return new BaseResponse<>(RepeatTodoResponseDto.fromGetRepeatTodoDto(
+                GetRepeatTodoDto.builder()
+                        .todoId(repeatTodo.getId())
+                        .todo(repeatTodo.getTodoItem())
+                        .deadline(repeatTodo.getDeadline())
+                        .userId(repeatTodo.getUserId())
+                        .build()
+        ));
     }
 
     @GetMapping("/room/{roomId}/todo/day")
@@ -107,19 +113,19 @@ public class TodoController {
     }
 
     @PatchMapping("/room/{roomId}/todo/{todoId}/day")
-    BaseResponse<?> completeTodayTodo(
+    BaseResponse<TodayTodoResponseDto> completeTodayTodo(
             @PathVariable Long roomId,
             @PathVariable Long todoId,
             HttpSession session
     ) {
         var user = (User) session.getAttribute(LOGIN_USER);
 
-        todoService.completeTodayTodo(user.getId(), roomId, todoId);
-        return new BaseResponse<>(SUCCESS);
+        var completedTodo = todoService.completeTodayTodo(user.getId(), roomId, todoId);
+        return new BaseResponse<>(TodayTodoResponseDto.fromTodayTodo(completedTodo));
     }
 
     @PostMapping("/room/{roomId}/compliment")
-    BaseResponse<?> complimentMember(
+    BaseResponse<ComplimentResponseDto> complimentMember(
             @PathVariable Long roomId,
             @RequestParam Long memberId,
             HttpSession session
@@ -127,6 +133,6 @@ public class TodoController {
         var user = (User) session.getAttribute(LOGIN_USER);
 
         todoService.complimentMember(user.getId(), memberId);
-        return new BaseResponse<>(SUCCESS);
+        return new BaseResponse<>(ComplimentResponseDto.of(user.getId(), memberId));
     }
 }

@@ -20,8 +20,8 @@ public class MemoStoreImpl implements MemoStore {
     private final MemoJpaRepository memoJpaRepository;
 
     @Override
-    public void saveMemo(Memo memo) {
-        memoJpaRepository.save(memo);
+    public Memo saveMemo(Memo memo) {
+        return memoJpaRepository.save(memo);
     }
 
     @Override
